@@ -1,7 +1,7 @@
 {
-  "name": "SKELETON",
+  "name": "LineLengthBot",
   "version": "1.0.0",
-  "description": "Bagel's bot skeleton framework",
+  "description": "Limits Discord messages to a set line and character limit",
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/detjensrobert/BOT_REPO.git"
+    "url": "git+https://github.com/detjensrobert/LineLengthBot.git"
   },
   "author": "Robert Detjens / wholewheatbagels",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/detjensrobert/BOT_REPO/issues"
+    "url": "https://github.com/detjensrobert/LineLengthBot/issues"
   },
-  "homepage": "https://github.com/detjensrobert/BOT_REPO#readme",
+  "homepage": "https://github.com/detjensrobert/LineLengthBot#readme",
   "dependencies": {
     "discord.js": "^11.5.1"
   },
