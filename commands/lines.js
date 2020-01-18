@@ -33,7 +33,7 @@ function execute(message, args, restricts) {
 
 	if (maxLines == 0) {
 		delete restricts.lines[`${message.channel.id}`];
-		replyStr = "Line limit removed."
+		replyStr = "Line limit removed.";
 	}
 
 	// write to file

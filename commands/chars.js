@@ -25,15 +25,15 @@ function execute(message, args, restricts) {
 		return message.channel.send(errEmbed);
 	}
 
-	console.log(`[ INFO ] Setting character limit for ${message.channel.name} to ${maxChars}`); 
+	console.log(`[ INFO ] Setting character limit for ${message.channel.name} to ${maxChars}`);
 
 	// set limit in memory
 	restricts.chars[`${message.channel.id}`] = maxChars;
 	let replyStr = `Character limit set to ${maxChars} characters.`;
-	
+
 	if (maxChars == 0) {
 		delete restricts.chars[`${message.channel.id}`];
-		replyStr = "Character limit removed."
+		replyStr = "Character limit removed.";
 	}
 
 	// write to file
