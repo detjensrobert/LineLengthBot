@@ -7,11 +7,11 @@ const fs = require('fs');
 
 // grab settings from file
 const { token } = require('./token.json');
-const { prefix, adminRoleID } = require('./config.json');
+const { prefix, colors, adminRoleID } = require('./config.json');
 
 // load saved restrictions from file
 // leave mutable for new restricts
-let restricts = require('./restrictions.json')
+const restricts = require('./restrictions.json');
 
 // import commands from dir
 client.commands = new Discord.Collection();
@@ -33,7 +33,7 @@ client.once('ready', () => {
 });
 
 client.on('message', message => {
-	
+
 	// check message against dir, remove & dm author if over limit
 	checkMessage(message);
 
@@ -45,9 +45,6 @@ client.on('message', message => {
 
 	// ignore DMs
 	if (message.channel.type !== "text") { return; }
-
-	// ignore messages not in specified channels, if given
-	if (restrictToChannels && !restrictToChannels.includes(message.channel.id)) { return; }
 
 	// turn message into array
 	const args = message.content.trim().slice(prefix.length).split(/ +/);
@@ -65,7 +62,7 @@ client.on('message', message => {
 	// == CHECK OPTIONS ==
 
 	// if admin only
-	if (command.adminOnly && !message.guild.fetchMember(message.author).roles.has(adminRoleID)) { return; }
+	if (command.adminOnly && !message.member.roles.has(adminRoleID)) { return; }
 
 	if (command.minArgs && args.length < command.minArgs) {
 		const errEmbed = new Discord.RichEmbed().setColor(colors.error)
@@ -94,7 +91,40 @@ process.on('unhandledRejection', error => console.error('Uncaught Promise Reject
 // ========
 
 
-function checkMessage (message) {
-	//chars first
-	console.log(message.cleanContent);
+function checkMessage(message) {
+
+	console.log("Message length: " + message.cleanContent.length);
+
+	// == chars first ==
+	const maxChars = restricts.chars[`${message.channel.id}`];
+
+	// if no restriction
+	if (!maxChars) {
+		return;
+	}
+
+	// if restricted and over the limit
+	if (message.cleanContent.length > maxChars) {
+		const errEmbed = new Discord.RichEmbed().setColor(colors.error)
+			.setTitle(`Your message was too long! Keep messages to under ${maxChars} characters, please.`);
+		message.author.send(errEmbed);
+		message.delete();
+	}
+
+	// == then lines ==
+	const maxLines = restricts.lines[`${message.channel.id}`];
+
+	// if no restriction
+	if (!maxLines) {
+		return;
+	}
+
+	// if restricted and over the limit
+	if (message.cleanContent.split(/\r\n|\r|\n/).length > maxLines) {
+		const errEmbed = new Discord.RichEmbed().setColor(colors.error)
+			.setTitle(`Your message was too long! Keep messages to under ${maxLines} lines, please.`);
+		message.author.send(errEmbed);
+		message.delete();
+	}
 }
+
