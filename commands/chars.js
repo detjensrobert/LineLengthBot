@@ -33,6 +33,10 @@ function execute(message, args, restricts) {
 	
 	// write to file
 	fs.writeFileSync('../restrictions.json', JSON.stringify(restricts, null, 4));
+	
+	const replyEmbed = new Discord.RichEmbed().setColor(colors.success)
+		.setTitle(`Character limit set to ${maxChars} characters.`)
+	return message.channel.send(replyEmbed);
 }
 
 module.exports = options;

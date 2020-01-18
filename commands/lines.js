@@ -3,20 +3,40 @@ const Discord = require('discord.js');
 
 const options = {
 
-	name: 'CMD_NAME',
+	name: 'lines',
 
-	usage: 'USAGE',
+	usage: '<max-lines>',
 
-	description: 'DESCRIPTION',
+	description: 'Restricts messages in the channel to less than <max-lines> lines.',
 
-	cooldown: 3,
-	minArgs: $MIN_ARGS,
+	adminOnly: true,
+	
+	minArgs: 1,
 };
 
-async function execute(message, args, db) {
+function execute(message, args, restricts) {
 	
-	// CODE HERE
+	const maxLines = parseInt(args.pop());
+
+	if (isNaN(capacity) || capacity < 0) {
+		const errEmbed = new Discord.RichEmbed().setColor(colors.error)
+			.setTitle("Line limit needs to be a positive number")
+			.addField("Usage:", `\`${prefix}${options.name} ${options.usage}\``);
+		return message.channel.send(errEmbed);
+	}
 	
+	// set limit in memory
+	restricts.lines[`${message.channel.id}`] = maxLines;
+	if (maxLines == 0) {
+		delete restricts.lines[`${message.channel.id}`];
+	}
+	
+	// write to file
+	fs.writeFileSync('../restrictions.json', JSON.stringify(restricts, null, 4));
+	
+	const replyEmbed = new Discord.RichEmbed().setColor(colors.success)
+		.setTitle(`Line limit set to ${maxLines} characters.`)
+	return message.channel.send(replyEmbed);
 }
 
 module.exports = options;
