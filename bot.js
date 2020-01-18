@@ -97,9 +97,10 @@ function checkMessage(message) {
 
 	// == chars first ==
 	const maxChars = restricts.chars[`${message.channel.id}`];
-
+	const maxLines = restricts.lines[`${message.channel.id}`];
+	
 	// if no restriction
-	if (!maxChars) {
+	if (!(maxChars || maxLines)) {
 		return;
 	}
 
@@ -109,22 +110,15 @@ function checkMessage(message) {
 			.setTitle(`Your message was too long! Keep messages to under ${maxChars} characters, please.`);
 		message.author.send(errEmbed);
 		message.delete();
-	}
-
-	// == then lines ==
-	const maxLines = restricts.lines[`${message.channel.id}`];
-
-	// if no restriction
-	if (!maxLines) {
 		return;
 	}
-
-	// if restricted and over the limit
+	
 	if (message.cleanContent.split(/\r\n|\r|\n/).length > maxLines) {
 		const errEmbed = new Discord.RichEmbed().setColor(colors.error)
 			.setTitle(`Your message was too long! Keep messages to under ${maxLines} lines, please.`);
 		message.author.send(errEmbed);
 		message.delete();
+		return;
 	}
 }
 

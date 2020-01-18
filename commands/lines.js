@@ -25,17 +25,22 @@ function execute(message, args, restricts) {
 		return message.channel.send(errEmbed);
 	}
 
+	console.log(`[ INFO ] Setting line limit for ${message.channel.name} to ${maxLines}`);
+
 	// set limit in memory
 	restricts.lines[`${message.channel.id}`] = maxLines;
+	let replyStr = `Line limit set to ${maxLines} lines.`;
+
 	if (maxLines == 0) {
 		delete restricts.lines[`${message.channel.id}`];
+		replyStr = "Line limit removed."
 	}
 
 	// write to file
-	fs.writeFileSync('../restrictions.json', JSON.stringify(restricts, null, 4));
+	fs.writeFileSync('./restrictions.json', JSON.stringify(restricts, null, 4));
 
 	const replyEmbed = new Discord.RichEmbed().setColor(colors.success)
-		.setTitle(`Line limit set to ${maxLines} characters.`);
+		.setTitle(replyStr);
 	return message.channel.send(replyEmbed);
 }
 

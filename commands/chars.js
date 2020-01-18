@@ -25,21 +25,22 @@ function execute(message, args, restricts) {
 		return message.channel.send(errEmbed);
 	}
 
-	console.log(`[ INFO ] Setting character limit for ${message.channel.name} to ${maxChars}`);
+	console.log(`[ INFO ] Setting character limit for ${message.channel.name} to ${maxChars}`); 
 
 	// set limit in memory
 	restricts.chars[`${message.channel.id}`] = maxChars;
+	let replyStr = `Character limit set to ${maxChars} characters.`;
+	
 	if (maxChars == 0) {
 		delete restricts.chars[`${message.channel.id}`];
+		replyStr = "Character limit removed."
 	}
-
-	console.log(restricts.chars);
 
 	// write to file
 	fs.writeFileSync('./restrictions.json', JSON.stringify(restricts, null, 4));
 
 	const replyEmbed = new Discord.RichEmbed().setColor(colors.success)
-		.setTitle(`Character limit set to ${maxChars} characters.`);
+		.setTitle(replyStr);
 	return message.channel.send(replyEmbed);
 }
 
