@@ -18,7 +18,7 @@ function execute(message, args, restricts) {
 	
 	const maxChars = parseInt(args.pop());
 
-	if (isNaN(capacity) || capacity <= 0) {
+	if (isNaN(capacity) || capacity < 0) {
 		const errEmbed = new Discord.RichEmbed().setColor(colors.error)
 			.setTitle("Character limit needs to be a positive number")
 			.addField("Usage:", `\`${prefix}${options.name} ${options.usage}\``);
@@ -26,10 +26,13 @@ function execute(message, args, restricts) {
 	}
 	
 	// set limit in memory
-	restricts.chars[message.channel.id] = maxChars;
+	restricts.chars[`${message.channel.id}`] = maxChars;
+	if (maxChars == 0) {
+		delete restricts.chars[`${message.channel.id}`];
+	}
 	
 	// write to file
-	fs.writeFileSync('student-2.json', JSON.stringify(restricts, null, 4));
+	fs.writeFileSync('../restrictions.json', JSON.stringify(restricts, null, 4));
 }
 
 module.exports = options;
