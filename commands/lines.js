@@ -5,10 +5,11 @@ const fs = require('fs');
 const options = {
 
 	name: 'lines',
+	aliases: ['line', 'l'],
 
 	usage: '<max-lines>',
 
-	description: 'Restricts messages in the channel to less than <max-lines> lines.',
+	description: 'Restricts messages in the channel to less than <max-lines> lines.\nSet to 0 to remove the restriction.',
 
 	adminOnly: true,
 

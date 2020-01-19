@@ -5,10 +5,11 @@ const fs = require('fs');
 const options = {
 
 	name: 'chars',
+	aliases: ['char', 'c'],
 
 	usage: '<max-chars>',
 
-	description: 'Restricts messages in the channel to less than <max-chars> characters.',
+	description: 'Restricts messages in the channel to less than <max-chars> characters.\nSet to 0 to remove the restriction.',
 
 	adminOnly: true,
 
