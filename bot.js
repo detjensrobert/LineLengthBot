@@ -9,15 +9,15 @@ const fs = require('fs');
 const { token } = require('./token.json');
 const { prefix, colors, adminRoleID } = require('./config.json');
 
-// load saved restrictions from file
-// leave mutable for new restricts
+// load saved restrictions from file (or template if no file)
 let restricts;
+console.log("[ START ] Loading restrictions from file...");
 if (fs.existsSync('./restrictions.json')) {
-	console.log("[ START ] Loading restrictions from file...");
 	restricts = require('./restrictions.json');
-} else {
+}
+else {
 	console.log("[ START ] No restrictions file found, using blank template...");
-	restricts = { "chars": [], "lines": []};
+	restricts = { "chars": {}, "lines": {} };
 }
 
 
@@ -89,14 +89,14 @@ console.log("[ START ] Logging in to Discord...");
 client.login(token);
 
 // catch and log promise rejections
-process.on('unhandledRejection', error => console.error('[ ERROR ] Uncaught Promise Rejection', error));
+process.on('unhandledRejection', error => console.error('[ ERROR ] Uncaught Promise Rejection:\n', error));
 
 
 // ========
 
 
 function checkMessage(message) {
-	
+
 	// get restrictions for the channel
 	const maxChars = restricts.chars[`${message.channel.id}`];
 	const maxLines = restricts.lines[`${message.channel.id}`];
@@ -114,15 +114,16 @@ function checkMessage(message) {
 		return;
 	}
 
-	// if restricted and over the limit
-	let errStr = "Your message was too long! Keep messages to under ";
-	if (overChars) errStr += `${maxChars} characters`;
-	if (overChars && overLines) errStr += " and ";
-	if (overLines) errStr += `${maxLines} lines`;
-	errStr += ", please.";
+	let sizeStr = "";
+	if (maxChars) sizeStr += `${maxChars} characters`;
+	if (maxChars && maxLines) sizeStr += " and ";
+	if (maxLines) sizeStr += `${maxLines} lines`;
 
+	// if restricted and over the limit
 	const errEmbed = new Discord.RichEmbed().setColor(colors.error)
-		.setTitle(errStr);
+		.setTitle(`Oops! Your message in \`${message.guild.name}\` was too big!`)
+		.setDescription(`In #${message.channel.name}, keep posts to under ${sizeStr}.`)
+		.addField("Original post:", "```" + message.cleanContent.replace(/`/gi, "'") + "```");
 	message.author.send(errEmbed);
 	message.delete();
 

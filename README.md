@@ -29,7 +29,7 @@ Bot token goes in `token.json`. Create if not present:
 The admin role's ID and the prefix goes in `config.json`: 
 ```json
 {
-  "prefix": "!PREFIX"
+  "prefix": "!PREFIX",
   "adminRoleID": "ROLE ID HERE"
 }
 ```

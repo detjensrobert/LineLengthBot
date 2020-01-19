@@ -45,7 +45,8 @@ function execute(message, args, restricts) {
 	message.channel.send(replyEmbed).then(response => response.delete(60 * 1000));
 
 	// delete original command
-	message.delete();
+	// need to check if cam be deleted since it might already have been deleted by the restriction pass
+	if (!message.deleted) message.delete();
 
 	return;
 }

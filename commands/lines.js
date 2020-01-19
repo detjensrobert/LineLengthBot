@@ -35,7 +35,7 @@ function execute(message, args, restricts) {
 		delete restricts.lines[`${message.channel.id}`];
 		replyStr = "Line limit removed.";
 	}
-
+	
 	// write to file
 	fs.writeFileSync('./restrictions.json', JSON.stringify(restricts, null, 4));
 
@@ -45,7 +45,9 @@ function execute(message, args, restricts) {
 	message.channel.send(replyEmbed).then(response => response.delete(60 * 1000));
 
 	// delete original command
-	message.delete();
+	// need to check if cam be deleted since it might already have been deleted by the restriction pass
+	if (!message.deleted) message.delete();
+
 
 	return;
 }
