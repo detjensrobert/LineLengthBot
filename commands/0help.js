@@ -7,6 +7,8 @@ const options = {
 	aliases: ['info', '?', 'h'],
 
 	description: 'Shows this list of commands.',
+	
+	adminOnly: true,
 
 	cooldown: 5,
 };
