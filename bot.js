@@ -11,7 +11,15 @@ const { prefix, colors, adminRoleID } = require('./config.json');
 
 // load saved restrictions from file
 // leave mutable for new restricts
-const restricts = require('./restrictions.json');
+let restricts;
+if (fs.existsSync('./restrictions.json')) {
+	console.log("[ START ] Loading restrictions from file...");
+	restricts = require('./restrictions.json');
+} else {
+	console.log("[ START ] No restrictions file found, using blank template...");
+	restricts = { "chars": [], "lines": []};
+}
+
 
 // import commands from dir
 client.commands = new Discord.Collection();
