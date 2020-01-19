@@ -65,3 +65,4 @@ token.json
 mongodb_config.json
 
 .eslintrc.json
+restrictions.json
