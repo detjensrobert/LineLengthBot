@@ -102,17 +102,13 @@ function checkMessage(message) {
 	const maxLines = restricts.lines[`${message.channel.id}`];
 
 	// if no restriction
-	if (!(maxChars || maxLines)) {
-		return;
-	}
+	if (!(maxChars || maxLines)) return;
 
 	const overChars = message.cleanContent.length > maxChars;
 	const overLines = message.cleanContent.split(/\r\n|\r|\n/).length > maxLines;
 
 	// if not over
-	if (!(overChars || overLines)) {
-		return;
-	}
+	if (!(overChars || overLines)) return;
 
 	let sizeStr = "";
 	if (maxChars) sizeStr += `${maxChars} characters`;
