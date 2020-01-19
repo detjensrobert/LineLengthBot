@@ -73,11 +73,7 @@ client.on('message', message => {
 
 	// ==============
 	// ACTUAL COMMAND CALL
-	command.execute(message, args, restricts)
-		.catch(err => {
-			console.error("[ ERROR ] " + err);
-			message.reply('there was an error trying to execute that command!');
-		});
+	command.execute(message, args, restricts);
 
 });
 
@@ -85,17 +81,15 @@ console.log("[ START ] Logging in to Discord...");
 client.login(token);
 
 // catch and log promise rejections
-process.on('unhandledRejection', error => console.error('Uncaught Promise Rejection', error));
+process.on('unhandledRejection', error => console.error('[ ERROR ] Uncaught Promise Rejection', error));
 
 
 // ========
 
 
 function checkMessage(message) {
-
-	console.log("Message length: " + message.cleanContent.length);
-
-	// == chars first ==
+	
+	// get restrictions for the channel
 	const maxChars = restricts.chars[`${message.channel.id}`];
 	const maxLines = restricts.lines[`${message.channel.id}`];
 
@@ -104,21 +98,25 @@ function checkMessage(message) {
 		return;
 	}
 
-	// if restricted and over the limit
-	if (message.cleanContent.length > maxChars) {
-		const errEmbed = new Discord.RichEmbed().setColor(colors.error)
-			.setTitle(`Your message was too long! Keep messages to under ${maxChars} characters, please.`);
-		message.author.send(errEmbed);
-		message.delete();
+	const overChars = message.cleanContent.length > maxChars;
+	const overLines = message.cleanContent.split(/\r\n|\r|\n/).length > maxLines;
+
+	// if not over
+	if (!(overChars || overLines)) {
 		return;
 	}
 
-	if (message.cleanContent.split(/\r\n|\r|\n/).length > maxLines) {
-		const errEmbed = new Discord.RichEmbed().setColor(colors.error)
-			.setTitle(`Your message was too long! Keep messages to under ${maxLines} lines, please.`);
-		message.author.send(errEmbed);
-		message.delete();
-		return;
-	}
+	// if restricted and over the limit
+	let errStr = "Your message was too long! Keep messages to under ";
+	if (overChars) errStr += `${maxChars} characters`;
+	if (overChars && overLines) errStr += " and ";
+	if (overLines) errStr += `${maxLines} lines`;
+	errStr += ", please.";
+
+	const errEmbed = new Discord.RichEmbed().setColor(colors.error)
+		.setTitle(errStr);
+	message.author.send(errEmbed);
+	message.delete();
+
 }
 

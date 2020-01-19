@@ -25,7 +25,7 @@ function execute(message, args, restricts) {
 		return message.channel.send(errEmbed);
 	}
 
-	console.log(`[ INFO ] Setting character limit for ${message.channel.name} to ${maxChars}`);
+	console.log(`[ INFO ] Setting character limit for #${message.channel.name} to ${maxChars}`);
 
 	// set limit in memory
 	restricts.chars[`${message.channel.id}`] = maxChars;
@@ -39,9 +39,15 @@ function execute(message, args, restricts) {
 	// write to file
 	fs.writeFileSync('./restrictions.json', JSON.stringify(restricts, null, 4));
 
+	// send confirmation message, then delete after 60s
 	const replyEmbed = new Discord.RichEmbed().setColor(colors.success)
 		.setTitle(replyStr);
-	return message.channel.send(replyEmbed);
+	message.channel.send(replyEmbed).then(response => response.delete(60 * 1000));
+
+	// delete original command
+	message.delete();
+
+	return;
 }
 
 module.exports = options;

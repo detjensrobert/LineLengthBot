@@ -20,14 +20,14 @@ This bot restricts messages in Discord channels to a certain length.
 Main file is `bot.js`.  `npm start` will start the bot.
 
 Bot token goes in `token.json`. Create if not present:
-```
+```json
 {
   "token": "TOKEN HERE"
 }
 ```
 
 The admin role's ID and the prefix goes in `config.json`: 
-```
+```json
 {
   "prefix": "!PREFIX"
   "adminRoleID": "ROLE ID HERE"
