@@ -96,6 +96,9 @@ process.on('unhandledRejection', error => console.error('[ ERROR ] Uncaught Prom
 
 
 function checkMessage(message) {
+	
+	// ignore bot messages
+	if (message.author.bot) return;
 
 	// get restrictions for the channel
 	const maxChars = restricts.chars[`${message.channel.id}`];
