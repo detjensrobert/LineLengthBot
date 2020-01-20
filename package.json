@@ -5,7 +5,9 @@
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node .",
+    "start": "pm2 start . --name LineLength",
+    "stop": "pm2 stop . --name LineLength",
+    "restart": "pm2 restart . --name LineLength",
     "fix": "npx eslint . --fix",
     "lint": "npx eslint ."
   },
@@ -20,7 +22,8 @@
   },
   "homepage": "https://github.com/detjensrobert/LineLengthBot#readme",
   "dependencies": {
-    "discord.js": "^11.5.1"
+    "discord.js": "^11.5.1",
+    "pm2": "^4.2.1"
   },
   "devDependencies": {
     "eslint": "^6.8.0"

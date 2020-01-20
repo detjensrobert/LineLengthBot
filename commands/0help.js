@@ -1,4 +1,4 @@
-const { prefix, colors, middlemanRoleID } = require('../config.json');
+const config = require('../config.json');
 const Discord = require('discord.js');
 
 const options = {
@@ -7,8 +7,6 @@ const options = {
 	aliases: ['info', '?', 'h'],
 
 	description: 'Shows this list of commands.',
-	
-	adminOnly: true,
 
 	cooldown: 5,
 };
@@ -27,30 +25,36 @@ async function execute(message) {
 
 	const commands = message.client.commands;
 
-	const helpEmbed = new Discord.RichEmbed().setColor(colors.info)
-		.setAuthor("LineLengthBot Help", message.client.user.displayAvatarURL)
-		.setFooter("LineLengthBot created by WholeWheatBagels", 'https://cdn.discordapp.com/avatars/197460469336899585/efb49d183b81f30c42b25517e057a704.png');
+	const helpEmbed = new Discord.RichEmbed().setColor(config.colors.info)
+		.setAuthor(`${message.client.user.username} Help`, message.client.user.displayAvatarURL)
+		.setFooter(`${message.client.user.username} created by WholeWheatBagels`, 'https://cdn.discordapp.com/avatars/197460469336899585/efb49d183b81f30c42b25517e057a704.png');
 
 	commands.forEach((cmd) => {
+	// show if no restriction .. only show role-restricted commands if member is in a server and they have that role
+		if (!cmd.roleRestrict || (cmd.roleRestrict && message.guild && message.member.roles.has(config.roles[`${cmd.roleRestrict}`]))) {
 
-		let helpStr = cmd.description;
+			let helpStr = cmd.description;
 
-		if (cmd.usage) {
-			helpStr += `\n\`${prefix}${cmd.name} ${cmd.usage}\``;
+			if (cmd.usage) {
+				helpStr += `\n\`${config.prefix}${cmd.name} ${cmd.usage}\``;
+			}
+			else {
+				helpStr += `\n\`${config.prefix}${cmd.name}\``;
+			}
+
+			if (cmd.example) {
+				helpStr += `\nExamples:\n- \`${config.prefix}${cmd.name} ${cmd.example}\``;
+			}
+
+			if (cmd.roleRestrict) {
+				const roleID = config.roles[`${cmd.roleRestrict}`];
+				helpStr += `\n*(Restricted to @${ message.guild.roles.get(roleID).name } only)*`;
+			}
+
+			helpEmbed.addField(`**${cmd.name}**` + (cmd.aliases ? ", " + cmd.aliases.join(", ") : ""), helpStr);
+
 		}
-		else {
-			helpStr += `\n\`${prefix}${cmd.name}\``;
-		}
 
-		if (cmd.example) {
-			helpStr += `\nExamples:\n- \`${prefix}${cmd.name} ${cmd.example}\``;
-		}
-
-		if (cmd.adminOnly) {
-			helpStr += "\n*(Admin restricted)*";
-		}
-
-		helpEmbed.addField(`**${cmd.name}**` + (cmd.aliases ? ", " + cmd.aliases.join(", ") : ""), helpStr);
 	});
 
 	message.channel.send(helpEmbed);

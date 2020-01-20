@@ -36,7 +36,7 @@ function execute(message, args, restricts) {
 		delete restricts.lines[`${message.channel.id}`];
 		replyStr = "Line limit removed.";
 	}
-	
+
 	// write to file
 	fs.writeFileSync('./restrictions.json', JSON.stringify(restricts, null, 4));
 
