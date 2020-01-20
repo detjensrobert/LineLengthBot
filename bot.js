@@ -95,7 +95,7 @@ process.on('unhandledRejection', error => console.error('[ ERROR ] Uncaught Prom
 // ========
 
 
-function checkMessage(message) {
+async function checkMessage(message) {
 	
 	// ignore bot messages
 	if (message.author.bot) return;
@@ -123,7 +123,7 @@ function checkMessage(message) {
 		.setTitle(`Oops! Your message in \`${message.guild.name}\` was too big!`)
 		.setDescription(`In #${message.channel.name}, keep posts to under ${sizeStr}.`)
 		.addField("Original post:", "```" + message.cleanContent.replace(/`/gi, "'") + "```");
-	message.author.send(errEmbed);
+	await message.author.send(errEmbed);
 	message.delete();
 
 }
