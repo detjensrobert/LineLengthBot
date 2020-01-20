@@ -95,8 +95,8 @@ process.on('unhandledRejection', error => console.error('[ ERROR ] Uncaught Prom
 // ========
 
 
-function checkMessage(message) {
-	
+async function checkMessage(message) {
+
 	// ignore bot messages
 	if (message.author.bot) return;
 
@@ -118,12 +118,15 @@ function checkMessage(message) {
 	if (maxChars && maxLines) sizeStr += " and ";
 	if (maxLines) sizeStr += `${maxLines} lines`;
 
+	let msgText = message.cleanContent.replace(/`/gi, "'");
+	if (msgText.length > 950) msgText = msgText.substring(0, 950) + " (...)";
+
 	// if restricted and over the limit
 	const errEmbed = new Discord.RichEmbed().setColor(colors.error)
 		.setTitle(`Oops! Your message in \`${message.guild.name}\` was too big!`)
 		.setDescription(`In #${message.channel.name}, keep posts to under ${sizeStr}.`)
-		.addField("Original post:", "```" + message.cleanContent.replace(/`/gi, "'") + "```");
-	message.author.send(errEmbed);
+		.addField("Original post:", "```" + msgText + "```");
+	await message.author.send(errEmbed);
 	message.delete();
 
 }
