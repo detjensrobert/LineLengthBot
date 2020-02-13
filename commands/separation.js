@@ -5,12 +5,12 @@ const log = require('../utils/log.js');
 
 const options = {
 
-	name: 'chars',
-	aliases: ['char', 'c'],
+	name: 'separation',
+	aliases: ['sep', 's'],
 
-	usage: '<#max-chars>',
+	usage: '<#messages>',
 
-	description: 'Restricts messages in the channel to less than <max-chars> characters.\nSet to 0 to remove the restriction.',
+	description: 'Sets a required number of messages between posts from the same user.\nSet to 0 to remove the restriction.',
 
 	adminOnly: true,
 
@@ -19,23 +19,23 @@ const options = {
 
 function execute(message, args, restricts) {
 
-	const maxChars = parseInt(args.pop());
+	const separation = parseInt(args.pop());
 
-	if (isNaN(maxChars) || maxChars < 0) {
+	if (isNaN(separation) || separation < 0) {
 		const errEmbed = new Discord.RichEmbed().setColor(colors.error)
-			.setTitle("Character limit needs to be a positive number");
+			.setTitle("Separation needs to be a positive number");
 		return message.channel.send(errEmbed);
 	}
 
-	log.log('INFO', `Setting character limit for #${message.channel.name} to ${maxChars}`);
+	log.log('INFO', `Setting separation for #${message.channel.name} to ${separation}`);
 
 	// set limit in memory
-	restricts.chars[`${message.channel.id}`] = maxChars;
-	let replyStr = `Character limit set to ${maxChars} characters.`;
+	restricts.separation[`${message.channel.id}`] = separation;
+	let replyStr = `Message separation set to ${separation} messages.`;
 
-	if (maxChars == 0) {
-		delete restricts.chars[`${message.channel.id}`];
-		replyStr = "Character limit removed.";
+	if (separation == 0) {
+		delete restricts.separation[`${message.channel.id}`];
+		replyStr = "Message separation removed.";
 	}
 
 	// write to file
@@ -49,6 +49,7 @@ function execute(message, args, restricts) {
 	// delete original command
 	// need to check if cam be deleted since it might already have been deleted by the restriction pass
 	if (!message.deleted) message.delete();
+
 
 	return;
 }

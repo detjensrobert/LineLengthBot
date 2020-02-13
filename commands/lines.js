@@ -1,13 +1,14 @@
 const { colors } = require('../config.json');
 const Discord = require('discord.js');
 const fs = require('fs');
+const log = require('../utils/log.js');
 
 const options = {
 
 	name: 'lines',
 	aliases: ['line', 'l'],
 
-	usage: '<max-lines>',
+	usage: '<#max-lines>',
 
 	description: 'Restricts messages in the channel to less than <max-lines> lines.\nSet to 0 to remove the restriction.',
 
@@ -26,7 +27,7 @@ function execute(message, args, restricts) {
 		return message.channel.send(errEmbed);
 	}
 
-	console.log(`[ INFO ] Setting line limit for #${message.channel.name} to ${maxLines}`);
+	log.log('INFO', `Setting line limit for #${message.channel.name} to ${maxLines}`);
 
 	// set limit in memory
 	restricts.lines[`${message.channel.id}`] = maxLines;

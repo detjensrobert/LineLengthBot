@@ -1,6 +1,7 @@
 console.log("[ START ] Starting up...");
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const log = require('./utils/log.js');
 
 // file i/o
 const fs = require('fs');
@@ -11,13 +12,13 @@ const { prefix, colors, adminRoleID } = require('./config.json');
 
 // load saved restrictions from file (or template if no file)
 let restricts;
-console.log("[ START ] Loading restrictions from file...");
+log.log('START', "Loading restrictions from file...");
 if (fs.existsSync('./restrictions.json')) {
 	restricts = require('./restrictions.json');
 }
 else {
-	console.log("[ START ] No restrictions file found, using blank template...");
-	restricts = { "chars": {}, "lines": {} };
+	log.log('START', "No restrictions file found, using blank template...");
+	restricts = { "chars": {}, "lines": {}, "separation": {} };
 }
 
 
@@ -29,7 +30,7 @@ for (const file of commandFiles) {
 	const command = require("./commands/" + file);
 	client.commands.set(command.name, command);
 
-	console.log("[ START ] Added command: " + command.name);
+	log.log('START', "Added command: " + command.name);
 }
 
 
@@ -37,7 +38,7 @@ for (const file of commandFiles) {
 
 
 client.once('ready', () => {
-	console.log(`[ START ] Ready.`);
+	log.log('START', "Ready.");
 });
 
 client.on('message', message => {
@@ -85,7 +86,7 @@ client.on('message', message => {
 
 });
 
-console.log("[ START ] Logging in to Discord...");
+log.log('START', "Logging in to Discord...");
 client.login(token);
 
 // catch and log promise rejections
@@ -96,35 +97,41 @@ process.on('unhandledRejection', error => console.error('[ ERROR ] Uncaught Prom
 
 
 async function checkMessage(message) {
-	
+
 	// ignore bot messages
 	if (message.author.bot) return;
 
 	// get restrictions for the channel
 	const maxChars = restricts.chars[`${message.channel.id}`];
 	const maxLines = restricts.lines[`${message.channel.id}`];
+	const separation = restricts.separation[`${message.channel.id}`];
 
 	// if no restriction
-	if (!(maxChars || maxLines)) return;
+	if (!(maxChars || maxLines || separation)) return;
 
 	const overChars = message.cleanContent.length > maxChars;
 	const overLines = message.cleanContent.split(/\r\n|\r|\n/).length > maxLines;
 
-	// if not over
-	if (!(overChars || overLines)) return;
+	const prevMessages = await message.channel.fetchMessages({ limit: separation, before: message.id });
+	const overSeparation = prevMessages.find(msg => msg.author.id == message.author.id);
 
-	let sizeStr = "";
-	if (maxChars) sizeStr += `${maxChars} characters`;
-	if (maxChars && maxLines) sizeStr += " and ";
-	if (maxLines) sizeStr += `${maxLines} lines`;
+	// if not over
+	if (!(overChars || overLines || overSeparation)) return;
+
+	let restrictStr = "```md\n";
+	if (maxChars) restrictStr += `Under ${maxChars} characters\n`;
+	if (maxLines) restrictStr += `Under ${maxLines} lines\n`;
+	if (separation) restrictStr += `${separation} messages between posts\n`;
+	restrictStr += "```"
 
 	// if restricted and over the limit
 	const errEmbed = new Discord.RichEmbed().setColor(colors.error)
 		.setTitle(`Oops! Your message in \`${message.guild.name}\` was too big!`)
-		.setDescription(`In #${message.channel.name}, keep posts to under ${sizeStr}.`)
-		.addField("Original post:", "```" + message.cleanContent.replace(/`/gi, "'") + "```");
+		.setDescription(`In #${message.channel.name}, follow these restrictions: ${restrictStr}`)
+		.addField("Original post:", "```" + message.cleanContent.replace(/`/gi, "'").slice(0, 900) + "```");
 	await message.author.send(errEmbed);
-	message.delete();
+
+	if (!message.deleted) message.delete();
 
 }
 
