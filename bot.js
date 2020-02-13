@@ -119,16 +119,19 @@ async function checkMessage(message) {
 	if (!(overChars || overLines || overSeparation)) return;
 
 	let restrictStr = "```md\n";
-	if (maxChars) restrictStr += `Under ${maxChars} characters\n`;
-	if (maxLines) restrictStr += `Under ${maxLines} lines\n`;
-	if (separation) restrictStr += `${separation} messages between posts\n`;
+	if (maxChars) restrictStr += `- Under ${maxChars} characters\n`;
+	if (maxLines) restrictStr += `- Under ${maxLines} lines\n`;
+	if (separation) restrictStr += `- ${separation} messages between posts\n`;
 	restrictStr += "```"
+
+	let msgText = message.cleanContent.replace(/`/gi, "'");
+	if (msgText.length > 950) msgText = msgText.substring(0, 950) + " (...)";
 
 	// if restricted and over the limit
 	const errEmbed = new Discord.RichEmbed().setColor(colors.error)
 		.setTitle(`Oops! Your message in \`${message.guild.name}\` was too big!`)
 		.setDescription(`In #${message.channel.name}, follow these restrictions: ${restrictStr}`)
-		.addField("Original post:", "```" + message.cleanContent.replace(/`/gi, "'").slice(0, 900) + "```");
+		.addField("Original post:", "```" + msgText + "```");
 	await message.author.send(errEmbed);
 
 	if (!message.deleted) message.delete();
