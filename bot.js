@@ -95,7 +95,6 @@ process.on('unhandledRejection', error => console.error('[ ERROR ] Uncaught Prom
 
 // ========
 
-
 async function checkMessage(message) {
 
 	// ignore bot messages
@@ -104,25 +103,20 @@ async function checkMessage(message) {
 	// get restrictions for the channel
 	const maxChars = restricts.chars[`${message.channel.id}`];
 	const maxLines = restricts.lines[`${message.channel.id}`];
-	const separation = restricts.separation[`${message.channel.id}`];
 
 	// if no restriction
-	if (!(maxChars || maxLines || separation)) return;
+	if (!(maxChars || maxLines)) return;
 
 	const overChars = message.cleanContent.length > maxChars;
 	const overLines = message.cleanContent.split(/\r\n|\r|\n/).length > maxLines;
 
-	const prevMessages = await message.channel.fetchMessages({ limit: separation, before: message.id });
-	const overSeparation = prevMessages.find(msg => msg.author.id == message.author.id);
-
 	// if not over
-	if (!(overChars || overLines || overSeparation)) return;
+	if (!(overChars || overLines)) return;
 
-	let restrictStr = "```md\n";
-	if (maxChars) restrictStr += `- Under ${maxChars} characters\n`;
-	if (maxLines) restrictStr += `- Under ${maxLines} lines\n`;
-	if (separation) restrictStr += `- ${separation} messages between posts\n`;
-	restrictStr += "```"
+	let sizeStr = "";
+	if (maxChars) sizeStr += `${maxChars} characters`;
+	if (maxChars && maxLines) sizeStr += " and ";
+	if (maxLines) sizeStr += `${maxLines} lines`;
 
 	let msgText = message.cleanContent.replace(/`/gi, "'");
 	if (msgText.length > 950) msgText = msgText.substring(0, 950) + " (...)";
@@ -130,11 +124,8 @@ async function checkMessage(message) {
 	// if restricted and over the limit
 	const errEmbed = new Discord.RichEmbed().setColor(colors.error)
 		.setTitle(`Oops! Your message in \`${message.guild.name}\` was too big!`)
-		.setDescription(`In #${message.channel.name}, follow these restrictions: ${restrictStr}`)
+		.setDescription(`In #${message.channel.name}, keep posts to under ${sizeStr}.`)
 		.addField("Original post:", "```" + msgText + "```");
 	await message.author.send(errEmbed);
-
-	if (!message.deleted) message.delete();
-
+	message.delete();
 }
-
