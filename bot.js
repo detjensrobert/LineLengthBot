@@ -128,7 +128,7 @@ async function checkMessage(message) {
 	if (msgText.length > 900) msgText = msgText.substring(0, 900) + " (...)";
 
 	// if restricted and over the limit
-	log.log('INFO', `Deleting message from ${message.author.username} in #&{message.channel.name}`);
+	log.log('INFO', `Deleting message from ${message.author.username} in #${message.channel.name}`);
 	const errEmbed = new Discord.RichEmbed().setColor(colors.error)
 		.setTitle(`Oops! Your message in \`${message.guild.name}\` was too big!`)
 		.addField(`In \`#${message.channel.name}\`, keep posts within these guidelines:`, restrictStr)
