@@ -110,11 +110,11 @@ async function checkMessage(message) {
 
 	const overChars = message.cleanContent.length > maxChars;
 	const overLines = message.cleanContent.split(/\r\n|\r|\n/).length > maxLines;
-	
+
 	// check to see if any of the last X messages are from this message's author
-	const recentMsgs = await message.channel.fetchMessages({'before': message.id, 'limit': minSepar});
+	const recentMsgs = await message.channel.fetchMessages({ 'before': message.id, 'limit': minSepar });
 	const tooClose = recentMsgs.find(m => m.author.id === message.author.id);
-	
+
 	// if not over any restrict
 	if (!(overChars || overLines || tooClose)) return;
 
@@ -122,12 +122,13 @@ async function checkMessage(message) {
 	if (maxChars) restrictStr += `Under ${maxChars} characters\n`;
 	if (maxLines) restrictStr += `Under ${maxLines} lines\n`;
 	if (minSepar) restrictStr += `At least ${minSepar} other messages between yours\n`;
-	
+
 	// replace code ticks with quotes and trim message if its too long
 	let msgText = message.cleanContent.replace(/`/gi, "'");
 	if (msgText.length > 900) msgText = msgText.substring(0, 900) + " (...)";
 
 	// if restricted and over the limit
+	log.log('INFO', `Deleting message from ${message.author.username}`);
 	const errEmbed = new Discord.RichEmbed().setColor(colors.error)
 		.setTitle(`Oops! Your message in \`${message.guild.name}\` was too big!`)
 		.addField(`In \`#${message.channel.name}\`, keep posts within these guidelines:`, restrictStr)
