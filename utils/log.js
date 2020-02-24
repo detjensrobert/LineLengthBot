@@ -1,30 +1,30 @@
 const c = require('chalk');
 
-function buildStr (type, message) {
-	const d = new Date();
+function buildStr(type, message) {
 	let str;
-	
+
 	switch (type) {
-		case 'START':
-			str = c.cyan(type);
-			break;
-		case 'INFO':
-			str = c.green(type);
-			break;
-		case 'WARN':
-			str = c.yellow(type);
-			break;
-		case 'ERR':
-			str = c.red(type);
-			break;
-		default:
-			str = c.grey(type);
+	case 'START':
+		str = c.cyan(type);
+		break;
+	case 'INFO':
+		str = c.green(type);
+		break;
+	case 'WARN':
+		str = c.yellow(type);
+		break;
+	case 'ERR':
+		str = c.red(type);
+		break;
+	default:
+		str = c.grey(type);
 	}
-	
-	return "[ " + c.grey(d.toLocaleString()) + " | " + str + " ] " + message;
+
+	// [ M/DD/YYYY, H:MM:SS AP | TYPE ] Message
+	return "[ " + c.grey(new Date().toLocaleString()) + " | " + str + " ] " + message;
 }
 
-function log (type, message) {
+function log(type, message) {
 	console.log(buildStr(type, message));
 }
 

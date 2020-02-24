@@ -48,7 +48,7 @@ function execute(message, args, restricts) {
 
 	// delete original command
 	// need to check if cam be deleted since it might already have been deleted by the restriction pass
-	if (!message.deleted) message.delete();
+	if (message.deletable) message.delete();
 
 	return;
 }

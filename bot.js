@@ -8,7 +8,7 @@ const fs = require('fs');
 
 // grab settings from file
 const { token } = require('./token.json');
-const { prefix, colors, adminRoleID } = require('./config.json');
+const config = require('./config.json');
 
 // load saved restrictions from file (or template if no file)
 let restricts;
@@ -20,6 +20,7 @@ else {
 	log.log('START', "No restrictions file found, using blank template...");
 	restricts = { "chars": {}, "lines": {}, "separation": {} };
 }
+console.log(restricts);
 
 
 // import commands from dir
@@ -47,7 +48,7 @@ client.on('message', message => {
 	checkMessage(message);
 
 	// ignore messages that dont start with a valid prefix
-	if (!message.content.startsWith(prefix)) { return; }
+	if (!message.content.startsWith(config.prefix)) { return; }
 
 	// ignore bot messages
 	if (message.author.bot) { return; }
@@ -56,7 +57,7 @@ client.on('message', message => {
 	if (message.channel.type !== "text") { return; }
 
 	// turn message into array
-	const args = message.content.trim().slice(prefix.length).split(/ +/);
+	const args = message.content.trim().slice(config.prefix.length).split(/ +/);
 
 	// pull first word (the command) out
 	const commandName = args.shift().toLowerCase();
@@ -71,12 +72,12 @@ client.on('message', message => {
 	// == CHECK OPTIONS ==
 
 	// if admin only
-	if (command.adminOnly && !message.member.roles.has(adminRoleID)) { return; }
+	if (command.adminOnly && !message.member.roles.has(config.adminRoleID)) { return; }
 
 	if (command.minArgs && args.length < command.minArgs) {
-		const errEmbed = new Discord.RichEmbed().setColor(colors.error)
+		const errEmbed = new Discord.RichEmbed().setColor(config.colors.error)
 			.setTitle("Oops! Are you missing something?")
-			.addField("Usage:", `\`${prefix}${command.name} ${command.usage}\``);
+			.addField("Usage:", `\`${config.prefix}${command.name} ${command.usage}\``);
 		return message.channel.send(errEmbed);
 	}
 
@@ -112,8 +113,13 @@ async function checkMessage(message) {
 	const overLines = message.cleanContent.split(/\r\n|\r|\n/).length > maxLines;
 
 	// check to see if any of the last X messages are from this message's author
-	const recentMsgs = await message.channel.fetchMessages({ 'before': message.id, 'limit': minSepar });
-	const tooClose = recentMsgs.find(m => m.author.id === message.author.id);
+	// but only if theres a limit
+	let tooClose = false;
+	if (minSepar > 0) {
+		const recentMsgs = await message.channel.fetchMessages({ 'before': message.id, 'limit': minSepar });
+		tooClose = recentMsgs.find(m => m.author.id === message.author.id);
+	}
+	
 
 	// if not over any restrict
 	if (!(overChars || overLines || tooClose)) return;
@@ -123,16 +129,29 @@ async function checkMessage(message) {
 	if (maxLines) restrictStr += `Under ${maxLines} lines\n`;
 	if (minSepar) restrictStr += `At least ${minSepar} other messages between yours\n`;
 
+	let reasonStrs = [];
+	if (overChars) reasonStrs.push(`too big`);
+	if (overLines) reasonStrs.push(`too long`);
+	if (tooClose) reasonStrs.push(`sent too fast`);
+	reasonStrs = reasonStrs.join(', ');
+
 	// replace code ticks with quotes and trim message if its too long
 	let msgText = message.cleanContent.replace(/`/gi, "'");
 	if (msgText.length > 900) msgText = msgText.substring(0, 900) + " (...)";
 
 	// if restricted and over the limit
 	log.log('INFO', `Deleting message from ${message.author.username} in #${message.channel.name}`);
-	const errEmbed = new Discord.RichEmbed().setColor(colors.error)
-		.setTitle(`Oops! Your message in \`${message.guild.name}\` was too big!`)
+	const errEmbed = new Discord.RichEmbed().setColor(config.colors.error)
+		.setTitle(`Oops! Your message in \`${message.guild.name}\` was ` + reasonStrs)
 		.addField(`In \`#${message.channel.name}\`, keep posts within these guidelines:`, restrictStr)
 		.addField("Original post:", "```" + msgText + "```");
 	await message.author.send(errEmbed);
-	message.delete();
+
+	// log message to log channel
+	const logEmbed = new Discord.RichEmbed().setColor(config.colors.info).setTimestamp()
+		.setDescription(`Message from ${message.author} in ${message.channel} deleted because: ` + reasonStrs)
+		.addField("Original post:", "```" + msgText + "```");
+	message.guild.channels.get(config.logChannel).send(logEmbed);
+
+	if (message.deletable) message.delete();
 }

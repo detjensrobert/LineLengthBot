@@ -4,6 +4,7 @@
   "description": "Limits Discord messages to a set line and character limit",
   "main": "bot.js",
   "scripts": {
+    "once": "node .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "pm2 start bot.js --name LineLength",
     "stop": "pm2 stop bot.js",
