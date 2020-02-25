@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "pm2 start bot.js --name LineLength",
     "stop": "pm2 stop bot.js",
-    "restart": "pm2 restart bot,js",
+    "restart": "pm2 restart bot.js",
     "fix": "npx eslint . --fix",
     "lint": "npx eslint ."
   },
