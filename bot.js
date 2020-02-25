@@ -20,8 +20,6 @@ else {
 	log.log('START', "No restrictions file found, using blank template...");
 	restricts = { "chars": {}, "lines": {}, "separation": {} };
 }
-console.log(restricts);
-
 
 // import commands from dir
 client.commands = new Discord.Collection();
