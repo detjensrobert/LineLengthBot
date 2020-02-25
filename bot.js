@@ -142,14 +142,14 @@ async function checkMessage(message) {
 	// if restricted and over the limit
 	log.log('INFO', `Deleting message from ${message.author.username} in #${message.channel.name}`);
 	const errEmbed = new Discord.RichEmbed().setColor(config.colors.error)
-		.setTitle(`Oops! Your message in \`${message.guild.name}\` was ` + reasonStrs)
+		.setTitle(`Oops! Your message in \`${message.guild.name}\` was deleted for being` + reasonStrs)
 		.addField(`In \`#${message.channel.name}\`, keep posts within these guidelines:`, restrictStr)
 		.addField("Original post:", "```" + msgText + "```");
 	await message.author.send(errEmbed);
 
 	// log message to log channel
 	const logEmbed = new Discord.RichEmbed().setColor(config.colors.info).setTimestamp()
-		.setDescription(`Message from ${message.author} in ${message.channel} deleted because: ` + reasonStrs)
+		.setDescription(`Message from ${message.author} in ${message.channel} deleted for being: ` + reasonStrs)
 		.addField("Original post:", "```" + msgText + "```");
 	message.guild.channels.get(config.logChannel).send(logEmbed);
 
