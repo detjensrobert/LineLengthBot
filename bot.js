@@ -143,7 +143,9 @@ async function checkMessage(message) {
 		.setTitle(`Oops! Your message in \`${message.guild.name}\` was deleted for being ${reasonStrs}`)
 		.addField(`In \`#${message.channel.name}\`, keep posts within these guidelines:`, restrictStr)
 		.addField("Original post:", "```" + msgText + "```");
-	await message.author.send(errEmbed);
+	message.author.send(errEmbed).catch(err => {
+		log.log('ERR', "  Could not send deletion message to this user!");
+	});
 
 	// log message to log channel
 	const logEmbed = new Discord.RichEmbed().setColor(config.colors.info).setTimestamp()
