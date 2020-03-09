@@ -99,6 +99,9 @@ async function checkMessage(message) {
 	// ignore bot messages
 	if (message.author.bot) return;
 
+	// ignore moderator messages
+	if (message.member && message.member.roles.has(config.adminRoleID)) return;
+
 	// get restrictions for the channel
 	const maxChars = restricts.chars[`${message.channel.id}`];
 	const maxLines = restricts.lines[`${message.channel.id}`];
@@ -117,7 +120,7 @@ async function checkMessage(message) {
 		const recentMsgs = await message.channel.fetchMessages({ 'before': message.id, 'limit': minSepar });
 		tooClose = recentMsgs.find(m => m.author.id === message.author.id);
 	}
-	
+
 
 	// if not over any restrict
 	if (!(overChars || overLines || tooClose)) return;
