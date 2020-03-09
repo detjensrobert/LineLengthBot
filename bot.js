@@ -144,7 +144,7 @@ async function checkMessage(message) {
 		.addField(`In \`#${message.channel.name}\`, keep posts within these guidelines:`, restrictStr)
 		.addField("Original post:", "```" + msgText + "```");
 	message.author.send(errEmbed).catch(err => {
-		if (err) log.log('ERR', "  Could not send deletion message to this user!");
+		if (err.code == 5007) log.log('ERR', "  Could not send deletion message to this user!");
 	});
 
 	// log message to log channel
