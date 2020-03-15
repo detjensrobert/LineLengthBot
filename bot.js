@@ -89,7 +89,7 @@ log.log('START', "Logging in to Discord...");
 client.login(token);
 
 // catch and log promise rejections
-process.on('unhandledRejection', error => log.error('[ ERROR ] Uncaught Promise Rejection:\n', error));
+process.on('unhandledRejection', error => log.error(`ERROR`, error));
 
 
 // ========
